@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doodle Jump</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div id="game">
+            <div id="score">0</div>
+            <canvas id="canvas"></canvas>
+            <div id="start-screen">
+                <h1>Doodle Jump</h1>
+                <button id="start-button">开始游戏</button>
+                <p>使用方向键 ← 和 → 或者 A 和 D 键控制移动</p>
+            </div>
+            <div id="game-over-screen" class="hidden">
+                <h2>Game Over</h2>
+                <p>你的分数: <span id="final-score">0</span></p>
+                <button id="restart-button">重新开始</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
