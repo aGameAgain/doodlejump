@@ -1,0 +1,51 @@
+{
+  "name": "doodle-jump",
+  "version": "1.1.0",
+  "description": "A modern ES6 implementation of the classic Doodle Jump game",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "jest tests/Platform.test.js tests/Player.test.js tests/Renderer.test.js tests/InputHandler.test.js",
+    "test:watch": "jest --watch tests/Platform.test.js tests/Player.test.js tests/Renderer.test.js tests/InputHandler.test.js",
+    "test:coverage": "jest --coverage tests/Platform.test.js tests/Player.test.js tests/Renderer.test.js tests/InputHandler.test.js",
+    "dev": "http-server -p 3000",
+    "build": "echo 'No build process needed for vanilla JS'"
+  },
+  "keywords": [
+    "game",
+    "doodle-jump",
+    "javascript",
+    "es6",
+    "canvas"
+  ],
+  "author": "sko00o && claude-3.7-sonnet-thinking",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@jest/globals": "^29.7.0",
+    "babel-jest": "^29.7.0",
+    "canvas": "^2.11.2",
+    "http-server": "^14.1.1",
+    "jest": "^29.7.0",
+    "jest-canvas-mock": "^2.5.2",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "jest-canvas-mock/lib/index.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "js/**/*.js",
+      "main.js",
+      "!**/node_modules/**"
+    ]
+  }
+}
