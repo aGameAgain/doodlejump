@@ -1,5 +1,7 @@
 # Doodle Jump 游戏复刻版
 
+![CI Tests](https://github.com/sko00o/doodlejump/workflows/CI%20Tests/badge.svg)
+
 这是一个使用原生JavaScript、HTML5和CSS实现的Doodle Jump游戏复刻版。玩家控制一个角色在平台上不断向上跳跃，目标是获得尽可能高的分数。
 
 ![Doodle Jump游戏截图]()
