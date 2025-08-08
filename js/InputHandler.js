@@ -10,7 +10,6 @@ export default class InputHandler {
         this.tiltLeftActive = false;
         this.tiltRightActive = false;
         this.tiltEnabled = false;
-        this.tiltAxis = 0; // -1..1 analog axis derived from device tilt
         this.smoothedTiltAxis = 0; // EMA smoothed axis
         this.tiltConfig = { threshold: 5, maxAngle: 30, exponent: 1.0, alpha: 0.2 };
 
@@ -129,12 +128,10 @@ export default class InputHandler {
                 const curved = Math.pow(norm, exponent);
                 axis = curved * Math.sign(clamped);
             }
-            // Invert to align perceived tilt direction with movement (user feedback)
-            axis = -axis;
             // EMA smoothing
             this.smoothedTiltAxis = alpha * axis + (1 - alpha) * this.smoothedTiltAxis;
-            this.tiltAxis = this.smoothedTiltAxis;
             if (this.player) this.player.tiltAxis = this.smoothedTiltAxis;
+            // info: ensure 左倾为左、右倾为右
             this.tiltLeftActive = this.smoothedTiltAxis > 0;
             this.tiltRightActive = this.smoothedTiltAxis < 0;
             this.updatePlayerFlags();
@@ -183,7 +180,6 @@ export default class InputHandler {
         this.tiltEnabled = false;
         this.tiltLeftActive = false;
         this.tiltRightActive = false;
-        this.tiltAxis = 0;
         this.smoothedTiltAxis = 0;
         if (this.player) this.player.tiltAxis = 0;
         this.updatePlayerFlags();
