@@ -15,6 +15,12 @@
             <canvas id="canvas"></canvas>
             <div id="start-screen">
                 <h1>Doodle Jump</h1>
+                <div class="option-row">
+                    <label for="tilt-checkbox" class="checkbox">
+                        <input type="checkbox" id="tilt-checkbox">
+                        开启重力感应
+                    </label>
+                </div>
                 <button id="start-button">开始游戏</button>
                 <p>使用方向键 ← 和 → 或者 A 和 D 键控制移动</p>
             </div>
@@ -24,8 +30,7 @@
                 <button id="restart-button">重新开始</button>
             </div>
         </div>
-        <div id="legend" aria-label="平台图例">
-            <h3>平台图例</h3>
+        <div id="legend" aria-label="图例">
             <div class="legend-list">
                 <div class="legend-item">
                     <canvas class="legend-canvas" data-variant="normal" width="60" height="16" title="普通平台"></canvas>

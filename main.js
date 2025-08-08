@@ -10,6 +10,7 @@ const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over-screen');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
+const tiltCheckbox = document.getElementById('tilt-checkbox');
 
 canvas.width = 400;
 canvas.height = 600;
@@ -17,9 +18,17 @@ canvas.height = 600;
 const game = new Game(canvas, ctx);
 const inputHandler = new InputHandler(game.player);
 
-// Optional tilt control via URL param: ?tilt=1 or ?tilt=true
-const params = new URLSearchParams(window.location.search);
-const tiltRequested = /^(1|true)$/i.test(params.get('tilt') || '');
+// Prevent default touch behaviors on the canvas to avoid long-press selection/callouts
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+['touchstart', 'touchmove', 'touchend'].forEach((type) => {
+    canvas.addEventListener(
+        type,
+        (e) => {
+            e.preventDefault();
+        },
+        { passive: false }
+    );
+});
 
 game.setScoreElements(scoreElement, finalScoreElement);
 game.setGameOverCallback(() => {
@@ -31,9 +40,11 @@ function startGame() {
     gameOverScreen.classList.add('hidden');
     game.init();
 
-    // Enable tilt controls on user gesture if requested
-    if (tiltRequested) {
-        inputHandler.enableTiltControls().catch(() => {
+    // Reset tilt controls, then enable if checked
+    const shouldEnableTilt = (tiltCheckbox && tiltCheckbox.checked);
+    inputHandler.disableTiltControls();
+    if (shouldEnableTilt) {
+        inputHandler.enableTiltControls({ threshold: 5, maxAngle: 25, exponent: 1.7, alpha: 0.2 }).catch(() => {
             // Ignore errors; fall back to keyboard/touch
         });
     }

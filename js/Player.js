@@ -14,6 +14,7 @@ export default class Player {
         this.highestPoint = canvas.height;
         this.leftPressed = false;
         this.rightPressed = false;
+        this.tiltAxis = 0; // -1..1 analog horizontal axis
 
         // power-up state
         this.isCopterActive = false;
@@ -28,6 +29,7 @@ export default class Player {
         this.highestPoint = this.canvas.height;
         this.leftPressed = false;
         this.rightPressed = false;
+        this.tiltAxis = 0;
         this.isCopterActive = false;
         this.copterRemainingMs = 0;
     }
@@ -45,6 +47,9 @@ export default class Player {
             this.velocityX = -this.speed;
         } else if (this.rightPressed) {
             this.velocityX = this.speed;
+        } else if (typeof this.tiltAxis === 'number' && this.tiltAxis !== 0) {
+            // Analog tilt influence. Direction aligns with tilt sign.
+            this.velocityX = this.speed * this.tiltAxis;
         } else {
             this.velocityX = 0;
         }

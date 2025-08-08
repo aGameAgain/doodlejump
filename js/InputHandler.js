@@ -10,6 +10,9 @@ export default class InputHandler {
         this.tiltLeftActive = false;
         this.tiltRightActive = false;
         this.tiltEnabled = false;
+        this.tiltAxis = 0; // -1..1 analog axis derived from device tilt
+        this.smoothedTiltAxis = 0; // EMA smoothed axis
+        this.tiltConfig = { threshold: 5, maxAngle: 30, exponent: 1.0, alpha: 0.2 };
 
         this.tiltListener = null;
 
@@ -105,13 +108,35 @@ export default class InputHandler {
     async enableTiltControls(options = {}) {
         if (this.tiltEnabled) return true;
         const threshold = typeof options.threshold === 'number' ? options.threshold : 5; // degrees dead-zone
+        const maxAngle = typeof options.maxAngle === 'number' ? options.maxAngle : 25; // angle for full speed
+        const exponent = typeof options.exponent === 'number' ? options.exponent : 1.7; // response curve
+        const alpha = typeof options.alpha === 'number' ? options.alpha : 0.2; // EMA smoothing factor
+        this.tiltConfig = { threshold, maxAngle, exponent, alpha };
 
         const applyTilt = (gamma) => {
             // gamma: left/right tilt, negative = left, positive = right (typically)
             if (typeof gamma !== 'number') return;
-            const abs = Math.abs(gamma);
-            this.tiltLeftActive = gamma < -threshold;
-            this.tiltRightActive = gamma > threshold;
+            const { threshold: dz, maxAngle: max, exponent, alpha } = this.tiltConfig;
+            // clamp to max range
+            const clamped = Math.max(-max, Math.min(max, gamma));
+            const abs = Math.abs(clamped);
+            // dead-zone and normalization to 0..1
+            let axis = 0;
+            if (abs > dz) {
+                const effective = abs - dz;
+                const denom = Math.max(1e-6, max - dz);
+                const norm = Math.min(1, effective / denom);
+                const curved = Math.pow(norm, exponent);
+                axis = curved * Math.sign(clamped);
+            }
+            // Invert to align perceived tilt direction with movement (user feedback)
+            axis = -axis;
+            // EMA smoothing
+            this.smoothedTiltAxis = alpha * axis + (1 - alpha) * this.smoothedTiltAxis;
+            this.tiltAxis = this.smoothedTiltAxis;
+            if (this.player) this.player.tiltAxis = this.smoothedTiltAxis;
+            this.tiltLeftActive = this.smoothedTiltAxis > 0;
+            this.tiltRightActive = this.smoothedTiltAxis < 0;
             this.updatePlayerFlags();
         };
 
@@ -158,6 +183,9 @@ export default class InputHandler {
         this.tiltEnabled = false;
         this.tiltLeftActive = false;
         this.tiltRightActive = false;
+        this.tiltAxis = 0;
+        this.smoothedTiltAxis = 0;
+        if (this.player) this.player.tiltAxis = 0;
         this.updatePlayerFlags();
     }
 
@@ -177,8 +205,9 @@ export default class InputHandler {
             return;
         }
         if (this.tiltEnabled) {
-            this.player.leftPressed = this.tiltLeftActive;
-            this.player.rightPressed = this.tiltRightActive;
+            // For analog tilt, do not set digital flags; let Player use player.tiltAxis
+            this.player.leftPressed = false;
+            this.player.rightPressed = false;
             return;
         }
         this.player.leftPressed = false;
