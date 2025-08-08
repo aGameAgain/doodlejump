@@ -1,5 +1,6 @@
 import Game from './js/Game.js';
 import InputHandler from './js/InputHandler.js';
+import { NormalPlatform, TrampolinePlatform, BreakablePlatform } from './js/Platform.js';
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -16,6 +17,10 @@ canvas.height = 600;
 const game = new Game(canvas, ctx);
 const inputHandler = new InputHandler(game.player);
 
+// Optional tilt control via URL param: ?tilt=1 or ?tilt=true
+const params = new URLSearchParams(window.location.search);
+const tiltRequested = /^(1|true)$/i.test(params.get('tilt') || '');
+
 game.setScoreElements(scoreElement, finalScoreElement);
 game.setGameOverCallback(() => {
     gameOverScreen.classList.remove('hidden');
@@ -25,6 +30,13 @@ function startGame() {
     startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
     game.init();
+
+    // Enable tilt controls on user gesture if requested
+    if (tiltRequested) {
+        inputHandler.enableTiltControls().catch(() => {
+            // Ignore errors; fall back to keyboard/touch
+        });
+    }
     game.start();
 }
 
@@ -33,4 +45,25 @@ restartButton.addEventListener('click', startGame);
 
 window.onload = () => {
     startScreen.classList.remove('hidden');
+
+    // Render platform legend via platform draw methods
+    const canvases = document.querySelectorAll('.legend-canvas');
+    canvases.forEach((canvas) => {
+        const ctx = canvas.getContext('2d');
+        const variant = canvas.dataset.variant;
+        const x = 2;
+        const y = 2;
+        const width = canvas.width - 4;
+        const height = canvas.height - 4;
+
+        let platform;
+        if (variant === 'trampoline') {
+            platform = new TrampolinePlatform(x, y, width, height);
+        } else if (variant === 'breakable') {
+            platform = new BreakablePlatform(x, y, width, height);
+        } else {
+            platform = new NormalPlatform(x, y, width, height);
+        }
+        platform.draw(ctx);
+    });
 };

@@ -14,6 +14,12 @@ export default class Renderer {
         });
     }
 
+    drawPowerUps(powerUps) {
+        powerUps.forEach(powerUp => {
+            powerUp.draw(this.ctx);
+        });
+    }
+
     drawPlayer(player) {
         player.draw(this.ctx);
     }

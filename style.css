@@ -29,6 +29,47 @@ body {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
+#legend {
+  width: 400px;
+  margin-top: 12px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+#legend h3 {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.legend-list {
+  display: flex;
+  gap: 16px;
+}
+
+.legend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-item span {
+  font-size: 12px;
+  color: #666;
+  line-height: 1;
+}
+
+/* canvas-based swatches rendered by game code */
+.legend-canvas {
+  width: 60px;
+  height: 16px;
+  image-rendering: pixelated;
+  border-radius: 2px;
+}
+
 #canvas {
   position: absolute;
   top: 0;

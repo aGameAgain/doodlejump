@@ -14,6 +14,10 @@ export default class Player {
         this.highestPoint = canvas.height;
         this.leftPressed = false;
         this.rightPressed = false;
+
+        // power-up state
+        this.isCopterActive = false;
+        this.copterRemainingMs = 0;
     }
 
     reset() {
@@ -24,10 +28,17 @@ export default class Player {
         this.highestPoint = this.canvas.height;
         this.leftPressed = false;
         this.rightPressed = false;
+        this.isCopterActive = false;
+        this.copterRemainingMs = 0;
     }
 
-    update(gravity) {
-        this.velocityY += gravity;
+    update(gravity, deltaMs = 16.6667) {
+        // If copter active, maintain a strong upward velocity and ignore gravity
+        if (this.isCopterActive) {
+            this.velocityY = -8; // faster ascent
+        } else {
+            this.velocityY += gravity;
+        }
         this.y += this.velocityY;
 
         if (this.leftPressed) {
@@ -45,11 +56,27 @@ export default class Player {
         } else if (this.x > this.canvas.width) {
             this.x = -this.width;
         }
+
+        // handle copter timer using frame delta
+        if (this.isCopterActive) {
+            this.copterRemainingMs -= deltaMs;
+            if (this.copterRemainingMs <= 0) {
+                this.isCopterActive = false;
+                this.copterRemainingMs = 0;
+            }
+        }
     }
 
-    jump() {
-        this.velocityY = this.jumpForce;
+    jump(multiplier = 1) {
+        this.velocityY = this.jumpForce * multiplier;
         this.jumping = true;
+    }
+
+    activateCopter(durationMs) {
+        this.isCopterActive = true;
+        this.copterRemainingMs = durationMs;
+        // strong initial upward speed
+        this.velocityY = -8;
     }
 
     checkCollision(platform) {
@@ -78,6 +105,12 @@ export default class Player {
             ctx.fillRect(this.x + 16, this.y + 25, 8, 3);
         } else {
             ctx.fillRect(this.x + 16, this.y + 28, 8, 3);
+        }
+
+        // optional: small indicator when copter is active
+        if (this.isCopterActive) {
+            ctx.fillStyle = '#FF9800';
+            ctx.fillRect(this.x + this.width / 2 - 14, this.y - 6, 28, 4);
         }
     }
 }
